@@ -1,0 +1,56 @@
+documentation:
+  info:
+    version: '1'
+    title: <%= serviceName -%>
+    description: <%= serviceName -%> API
+  models:
+    -
+      name: "ErrorResponse"
+      description: "This is an error"
+      contentType: "application/json"
+      schema:
+        type: "object"
+        properties:
+          errorMessage:
+            type: "string"
+          errorType:
+            type: "string"
+          stackTrace:
+            type: "string"
+    -
+      name: "Thing"
+      description: "Thing object"
+      contentType: "application/json"
+      schema:
+        type: "object"
+        properties:
+          body:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+endpoints:
+  get-thing:
+    summary: "Get thing"
+    description: "Get thing by id"
+    pathParams:
+      -
+        name: "id"
+        description: "thing id"
+    requestHeaders:
+<% if (authorizer) { -%>
+      -
+        name: "Authorization"
+        description: "Bearer token"
+<% } -%>
+    methodResponses:
+        -
+          statusCode: "200"
+          responseBody:
+            description: "Thing data"
+          responseModels:
+            "application/json": "Thing"
+        -
+          statusCode: "409"
+          responseModels:
+            "application/json": "ErrorResponse"

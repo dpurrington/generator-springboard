@@ -1,0 +1,16 @@
+{
+  "name": "generator-springboard",
+  "version": "1.0.0",
+  "description": "Serverless stack generator",
+  "license": "MIT",
+  "repository": "dpurrington/generator-springboard",
+  "files": [
+    "app"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^3.2.0"
+  }
+}
