@@ -1,6 +1,5 @@
 const StaticFileHandler = require('serverless-aws-static-file-handler');
-const { SwaggerUIBundle, SwaggerUIStandalonePreset } = require('swagger-ui-dist');
-const pathToSwaggerUi = require('swagger-ui-dist').absolutePath()
+const pathToSwaggerUi = require('swagger-ui-dist').absolutePath();
 
 module.exports = rootPath => (event, context, callback) => {
   let root = pathToSwaggerUi;
@@ -9,5 +8,5 @@ module.exports = rootPath => (event, context, callback) => {
   new StaticFileHandler(root)
     .get(event, context)
     .then(response => callback(null, response))
-    .catch(err => callback(err))
+    .catch(err => callback(err));
 };

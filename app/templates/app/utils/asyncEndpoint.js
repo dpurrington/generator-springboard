@@ -11,7 +11,6 @@ module.exports = (fn) => (event, context) => {
   return fn(event, context)
     .then(response => {
       // TODO add endpoint logging
-      
       // headers to all responses
       if (!response.headers) response.headers = {};
       // this header is required for cors to work

@@ -52,9 +52,10 @@ module.exports = class extends Generator {
       author: '',
       license: 'ISC',
       scripts: {
-        test: './node_modules/.bin/jest',
+        lint: 'eslint app',
+        test: 'eslint app && jest',
         start: 'source env/local.env && serverless offline start -s local',
-        docs: 'source env/local.env && serverless openapi generate --format json',
+        docs: 'source env/local.env && serverless openapi generate --format json && npm run fixup',
         fixup: 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js'
       },
       dependencies: {
@@ -92,6 +93,11 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath('.gitignore_temp'),
       this.destinationPath('.gitignore'),
+      this.answers,
+    )
+    this.fs.copyTpl(
+      this.templatePath('.eslintrc'),
+      this.destinationPath('.eslintrc'),
       this.answers,
     )
     this.fs.copyTpl(

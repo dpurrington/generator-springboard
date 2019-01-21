@@ -13,7 +13,7 @@ provider:
       - ${env:SUBNET2_ID}
 <% } -%>
   environment:
-    NODE_ENV: ${env:NODE_ENV}
+    STAGE: ${env:STAGE}
 <% if (dynamodb) { -%>
     MAIN_TABLE: ${self:service}-main-${env:STAGE}
 <% } -%>
