@@ -17,12 +17,14 @@ provider:
 <% if (dynamodb) { -%>
     MAIN_TABLE: ${self:service}-main-${env:STAGE}
 <% } -%>
+<% if (serviceType === 'web service') { -%>
     API_ROOT:
       Fn::Join:
         - ""
         - - "https://"
           - Ref: "ApiGatewayRestApi"
           - ".execute-api.#{AWS::Region}.amazonaws.com/${env:STAGE}"
+<% } -%>
 
 <% if (dynamodb) { -%>
   iamRoleStatements:
@@ -37,11 +39,13 @@ provider:
 plugins:
   - serverless-pseudo-parameters
   - serverless-plugin-warmup
+<% if (serviceType === 'web service') { -%>
   - serverless-openapi-documentation
+  - serverless-offline
+<% } -%>
 <% if (dynamodb) { -%>
   - serverless-dynamodb-local
 <% } -%>
-  - serverless-offline
 
 package:
   exclude:
@@ -61,6 +65,7 @@ custom:
     destinationARN: ${env:LOGFORWARDING_CLOUDWATCH_ARN}
     filterPattern: '-START -END -REPORT'
 <% } -%>
+<% if (serviceType === 'web service') { -%>
   serverless-offline:
     port: 3001
   cors:
@@ -75,6 +80,8 @@ custom:
       - X-Amz-User-Agent
       - Access-Control-Allow-Origin
     allowCredentials: false
+  documentation: ${file(serverless.doc.yml):documentation}
+<% } -%>
 <% if (dynamodb) { -%>
   dynamodb:
     stages:
@@ -88,7 +95,6 @@ custom:
       seed: true
       convertEmptyValues: true
 <% } -%>
-  documentation: ${file(serverless.doc.yml):documentation}
 
 <% if (dynamodb) { -%>
 resources:
@@ -109,6 +115,17 @@ resources:
 
 <% } -%>
 functions:
+<% if (serviceType === 'scheduled task') { -%>
+  get-thing:
+    handler: app/handler.getThing
+<% if (logForwarding) { -%>
+    logForwarding:
+      enabled: true
+<% } -%>
+    events:
+      - schedule: rate(5 minutes)
+<% } -%>
+<% if (serviceType === 'web service') { -%>
   swagger:
     handler: app/handler.swagger
     events:
@@ -147,4 +164,4 @@ functions:
 <% if (authorizer) { -%>
           authorizer: *authorizer
 <% } -%>
-
+<% } -%>

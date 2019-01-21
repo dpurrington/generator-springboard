@@ -25,26 +25,32 @@
 ## <a name="install"></a>Install and run
 #### Install dependencies
 ```bash
-npm i
+npm ci
 ```
 
+<% if (dynamodb) { -%>
 #### Setup local
-This only needs to be run once after npm install
+This only needs to be run once after npm install.
 ```bash
 npm run setup
 ```
+<% } -%>
 
+<% if (serviceType === 'web service') { -%>
 #### Produce swagger docs
 Please run this and commit the openapi.json if you make changes to the api documentation
 ```bash
-npm run docs
+npm build
 ```
+<% } -%>
 
+<% if (serviceType === 'web service') { -%>
 #### Run local
 This will start everything
 ```bash
 npm start
 ```
+<% } -%>
 
 <% if (dynamodb) { -%>
 #### Access DynamoDB-local shell
@@ -84,14 +90,14 @@ This is a great tool. There is documentation and code examples in the shell that
 #### <a name="h-1"></a>Easy setup
 Run 2 commands and you are good to go
 ```bash
-npm i
+npm ci
 npm run setup
 
-# start will source you env vars for you
+# start will source your env vars for you
 npm start
 ```
 
-
+<% if (dynamodb) { -%>
 #### <a name="h-2"></a>Local development
 We are using serverless http endpoints with a local database running. To run the endpoints locally we are using a plugin for serverless called `serverless-offline`. To run DynamoDB locally we are using a plugin called `serverless-dynamodb-local`, this will handle both the installation and database creation automatically so you don't need anything setup prior.
 
@@ -99,8 +105,8 @@ We are using serverless http endpoints with a local database running. To run the
   - A local version of Dynamodb is running locally using `serverless-dynamodb-local`. No prior installations or setup is required for this to work.
 - <a name="h-4"></a>**No deployments required**
   - You can run the service locally using `serverless-offline`
-  - Since all the needed components run locally on your machine you do **not** need to deploy code to run or test is
-
+  - Since all the needed components run locally on your machine you do **not** need to deploy code to run or test it
+<% } -%>
 
 #### <a name="h-5"></a>Quality error handling
   The `asyncEndpoint` util adds quality error handling without any special setup. This will prevent errors from being swallowed/lost and clients not getting a response when an error happens.

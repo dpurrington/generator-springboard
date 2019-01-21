@@ -54,9 +54,6 @@ module.exports = class extends Generator {
       scripts: {
         lint: 'eslint app',
         test: 'eslint app && jest',
-        start: 'source env/local.env && serverless offline start -s local',
-        docs: 'source env/local.env && serverless openapi generate --format json && npm run fixup',
-        fixup: 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js'
       },
       dependencies: {
         eslint: '^5.1.0',
@@ -68,19 +65,27 @@ module.exports = class extends Generator {
         'serverless-plugin-warmup': '^4.2.0-rc.1',
         'serverless-pseudo-parameters': '^2.4.0',
         'swagger-ui-dist': '^3.20.3',
-        uuid: '^3.3.2'
+        uuid: '^3.3.2',
+        'serverless-openapi-documentation': '^0.4.0'
       },
       devDependencies: {
         jest: '^23.6.0',
-        'serverless-offline': '^3.31.3',
-        'serverless-openapi-documentation': '^0.4.0'
+        'serverless-offline': '^3.31.3'
       }
     };
 
+    if (this.answers.serviceType === 'web service') {
+      pkgJson.scripts.start = 'source env/local.env && serverless offline start -s local';
+      pkgJson.scripts.docs = 'npm run docs:build && npm run docs:deploy';
+      pkgJson.scripts['docs:build'] = 'source env/local.env && serverless openapi generate --format json && npm run docs:deploy';
+      pkgJson.scripts['docs:deploy'] = 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js';
+      pkgJson.scripts.build = 'npm run docs';
+    }
+
     if (this.answers.dynamodb) {
-      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate && npm run fixup';
+      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate';
       pkgJson.scripts.cleanup = 'kill -9 $(lsof -ti:8000) 2>/dev/null || true';
-      pkgJson.scripts.test = 'npm run cleanup && source env/local.env && (sls dynamodb start -s local) & sleep 5 && ./node_modules/.bin/jest && npm run cleanup';
+      pkgJson.scripts.test = 'eslint app && npm run cleanup && source env/local.env && (sls dynamodb start -s local) & sleep 5 && ./node_modules/.bin/jest && npm run cleanup';
 
       pkgJson.dependencies.dynamoose = '^1.3.0';
       pkgJson.devDependencies['serverless-dynamodb-local'] = '0.2.30';
