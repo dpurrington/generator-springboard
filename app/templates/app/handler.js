@@ -17,6 +17,6 @@ exports.swagger = swaggerHandler('/swagger-ui');
 
 exports.getThing = asyncEndpoint(async event => {
   const { id } = event.pathParameters || {};
-  const thing.get(id);
+  const thing = things.get(id);
   return { body: { thing } }
 });

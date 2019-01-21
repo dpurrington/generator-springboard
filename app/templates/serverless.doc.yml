@@ -1,8 +1,8 @@
 documentation:
   info:
     version: '1'
-    title: <%= serviceName -%>
-    description: <%= serviceName -%> API
+    title: <%= serviceName %>
+    description: <%= serviceName %> API
   models:
     -
       name: "ErrorResponse"

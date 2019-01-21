@@ -11,10 +11,11 @@ provider:
     subnetIds:
       - ${env:SUBNET_ID}
       - ${env:SUBNET2_ID}
-  environment:
 <% } -%>
+  environment:
+    NODE_ENV: ${env:NODE_ENV}
 <% if (dynamodb) { -%>
-    DATA_TABLE: ${self:service}-main-${env:STAGE}
+    MAIN_TABLE: ${self:service}-main-${env:STAGE}
 <% } -%>
     API_ROOT:
       Fn::Join:
@@ -131,18 +132,18 @@ functions:
           method: get
           contentHandling: CONVERT_TO_BINARY
 
-  get-things:
-    handler: app/handler.getThings
+  get-thing:
+    handler: app/handler.getThing
 <% if (logForwarding) { -%>
     logForwarding:
       enabled: true
 <% } -%>
     events:
       - http:
-          path: things
+          path: things/{id}
           method: get
           cors: ${self:custom.cors}
-          documentation: ${file(serverless.doc.yml):endpoints.get-things}
+          documentation: ${file(serverless.doc.yml):endpoints.get-thing}
 <% if (authorizer) { -%>
           authorizer: *authorizer
 <% } -%>

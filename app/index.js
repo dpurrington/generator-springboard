@@ -54,7 +54,8 @@ module.exports = class extends Generator {
       scripts: {
         test: './node_modules/.bin/jest',
         start: 'source env/local.env && serverless offline start -s local',
-        docs: 'source env/local.env && serverless openapi generate --format json'
+        docs: 'source env/local.env && serverless openapi generate --format json',
+        fixup: 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js'
       },
       dependencies: {
         eslint: '^5.1.0',
@@ -76,7 +77,7 @@ module.exports = class extends Generator {
     };
 
     if (this.answers.dynamodb) {
-      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate && node app/utils/fixSwaggerPath.js';
+      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate && npm run fixup';
       pkgJson.scripts.cleanup = 'kill -9 $(lsof -ti:8000) 2>/dev/null || true';
       pkgJson.scripts.test = 'npm run cleanup && source env/local.env && (sls dynamodb start -s local) & sleep 5 && ./node_modules/.bin/jest && npm run cleanup';
 
@@ -101,8 +102,6 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.spawnCommand('chmod', '+x', 'env/prod.env');
-    this.spawnCommand('chmod', '+x', 'env/local.env');
     this.npmInstall();
   }
 };
