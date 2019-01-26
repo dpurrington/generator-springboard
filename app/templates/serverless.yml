@@ -116,8 +116,8 @@ resources:
 <% } -%>
 functions:
 <% if (serviceType === 'scheduled task') { -%>
-  get-thing:
-    handler: app/handler.getThing
+  do-thing:
+    handler: app/handler.doThing
 <% if (logForwarding) { -%>
     logForwarding:
       enabled: true
