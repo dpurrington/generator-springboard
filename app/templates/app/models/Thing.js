@@ -10,4 +10,4 @@ const schema = new dynamoose.Schema({
   },
 }, { /* table options */ });
 
-module.exports = dynamoose.model(MAIN_TABLE, schema);
+module.exports = dynamoose.model(MAIN_TABLE, schema, { create: false });

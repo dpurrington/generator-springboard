@@ -4,13 +4,12 @@ const {
   things
 } = require('./services');
 <% } -%>
-const {
 <% if (serviceType === 'web service') { -%>
+const {
   asyncEndpoint,
   swaggerHandler,
-<% } -%>
-  logger,
 } = require('./utils');
+<% } -%>
 
 <% if (dynamodb) { -%>
 // use local dynamo when running locally
@@ -25,8 +24,13 @@ exports.swagger = swaggerHandler('/swagger-ui');
 <% if (serviceType === 'web service') { -%>
 exports.getThing = asyncEndpoint(async event => {
   const { id } = event.pathParameters || {};
-  const thing = things.get(id);
-  return { body: { thing } };
+  let thing = { id };
+<% if (dynamodb) { -%>
+  thing = await things.get(id);
+<% } -%>
+  if (!thing) return { statusCode: 404 };
+
+  return { body: thing };
 });
 <% } -%>
 <% if (serviceType === 'scheduled task') { -%>

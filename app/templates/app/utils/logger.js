@@ -5,5 +5,6 @@ const pino = require('pino');
 
 module.exports = pino({
   level: process.env.LOG_LEVEL || 'info',
-  prettyPrint: process.env.NODE_ENV !== 'production'
+  prettyPrint: process.env.LOG_PRETTY_PRINT || false,
+  useLevelLabels: true
 });

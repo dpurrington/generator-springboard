@@ -1,12 +1,16 @@
 // handles thrown erros
 // converts thrown erros to error responses
-const logger = require('./logger');
+const loggerParent = require('./logger');
 
 const devEnvs = ['dev', 'development', 'test', 'sandbox', 'debug'];
 
 module.exports = (fn) => (event, context) => {
   // This checks if the event is a scheduled event and immediately returns to keep endpoint warm
   if (event.source && event.source === 'aws.events') return {};
+
+  const requestId = event.requestContext.requestId;
+  const logger = loggerParent.child({ requestId });
+  logger.debug({ type: 'request', request: event });
 
   return fn(event, context)
     .then(response => {
@@ -16,6 +20,7 @@ module.exports = (fn) => (event, context) => {
       // this header is required for cors to work
       response.headers['Access-Control-Allow-Origin'] = '*';
       if (response.body && typeof response.body === 'object') response.body = JSON.stringify(response.body);
+      logger.debug({ type: 'response', response });
       return response;
     })
     .catch(e => {
@@ -33,6 +38,7 @@ module.exports = (fn) => (event, context) => {
         body: JSON.stringify(errorBody)
       };
 
+      logger.error({ type: 'response', response });
       return response;
     });
 };
