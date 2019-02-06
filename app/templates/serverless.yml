@@ -40,7 +40,6 @@ plugins:
   - serverless-pseudo-parameters
   - serverless-plugin-warmup
 <% if (serviceType === 'web service') { -%>
-  - serverless-openapi-documentation
   - serverless-offline
 <% } -%>
 <% if (dynamodb) { -%>
@@ -53,7 +52,7 @@ package:
 
 custom:
   warmup:
-    enabled: true
+    default: true
 <% if (authorizer) { -%>
   <<: &authorizer
     arn: ${env:AUTHORIZER_ARN}
@@ -80,7 +79,6 @@ custom:
       - X-Amz-User-Agent
       - Access-Control-Allow-Origin
     allowCredentials: false
-  documentation: ${file(serverless.doc.yml):documentation}
 <% } -%>
 <% if (dynamodb) { -%>
   dynamodb:
@@ -160,7 +158,6 @@ functions:
           path: things/{id}
           method: get
           cors: ${self:custom.cors}
-          documentation: ${file(serverless.doc.yml):endpoints.get-thing}
 <% if (authorizer) { -%>
           authorizer: *authorizer
 <% } -%>

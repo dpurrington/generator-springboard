@@ -65,8 +65,7 @@ module.exports = class extends Generator {
         'serverless-plugin-warmup': '^4.2.0-rc.1',
         'serverless-pseudo-parameters': '^2.4.0',
         'swagger-ui-dist': '^3.20.3',
-        uuid: '^3.3.2',
-        'serverless-openapi-documentation': '^0.4.0'
+        uuid: '^3.3.2'
       },
       devDependencies: {
         jest: '^23.6.0',
@@ -76,9 +75,7 @@ module.exports = class extends Generator {
 
     if (this.answers.serviceType === 'web service') {
       pkgJson.scripts.start = 'source env/local.env && serverless offline start -s local';
-      pkgJson.scripts.docs = 'npm run docs:build && npm run docs:deploy';
-      pkgJson.scripts['docs:build'] = 'source env/local.env && serverless openapi generate --format json && npm run docs:deploy';
-      pkgJson.scripts['docs:deploy'] = 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js';
+      pkgJson.scripts.docs = 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js';
       pkgJson.scripts.build = 'npm run docs';
     }
 
