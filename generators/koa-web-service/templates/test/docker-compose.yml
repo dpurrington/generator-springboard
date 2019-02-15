@@ -1,0 +1,44 @@
+version: '3'
+services:
+  service:
+    container_name: falcon_service_test
+    build:
+      context: ../
+      dockerfile: ./test/Dockerfile
+    volumes:
+      - ../coverage:/opt/test/coverage
+    command: ['sh', './wait-for-services.sh', 'npm', 'run check_all']
+    env_file: '.env'
+    depends_on:
+      - mariadb
+  mariadb:
+    image: mariadb:10.2
+    container_name: falcon_mariadb_test
+    hostname: mariadb
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'test'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: ''
+      MYSQL_MODES: ''
+    labels:
+      SERVICE_TAGS: mysql
+      SERVICE_NAME: mysql
+      SERVICE_ID: mysql
+    ports:
+      - 3306
+    depends_on:
+      - registrator
+  registrator:
+    container_name: falcon_registrator_test
+    image: gliderlabs/registrator
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+    command: "-cleanup -resync 30 -internal=true consul://consul:8500"
+    depends_on:
+      - consul
+  consul:
+    container_name: falcon_consul_test
+    image: consul:latest
+    hostname: consul
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=1 -ui

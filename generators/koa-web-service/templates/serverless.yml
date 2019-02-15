@@ -1,0 +1,125 @@
+service: <%= serviceName -%>
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  memorySize: 512
+<% if (vpc) { -%>
+  vpc:
+    securityGroupIds:
+      - ${env:SECURITY_GROUP_ID}
+    subnetIds:
+      - ${env:SUBNET_ID}
+      - ${env:SUBNET2_ID}
+<% } -%>
+  environment:
+    STAGE: ${opt:stage}
+<% if (dynamodb) { -%>
+    MAIN_TABLE: ${self:service}-main-${opt:stage}
+<% } -%>
+<% if (serviceType === 'web service') { -%>
+    API_ROOT:
+      Fn::Join:
+        - ""
+        - - "https://"
+          - Ref: "ApiGatewayRestApi"
+          - ".execute-api.#{AWS::Region}.amazonaws.com/${opt:stage}"
+<% } -%>
+
+<% if (dynamodb) { -%>
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "dynamodb:*"
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}/*
+
+<% } -%>
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-plugin-warmup
+  - serverless-offline
+<% if (dynamodb) { -%>
+  - serverless-dynamodb-local
+<% } -%>
+
+package:
+  exclude:
+    - test/**
+
+custom:
+  warmup:
+    default: true
+<% if (authorizer) { -%>
+  <<: &authorizer
+    arn: ${env:AUTHORIZER_ARN}
+    identityValidationExpression: ^Bearer +[-0-9a-zA-Z\._]*$
+    resultTtlInSeconds: 300
+<% } -%>
+<% if (logForwarding) { -%>
+  logForwarding:
+    destinationARN: ${env:LOGFORWARDING_CLOUDWATCH_ARN}
+    filterPattern: '-START -END -REPORT'
+<% } -%>
+  serverless-offline:
+    port: 3001
+  cors:
+    origin: '*'
+    headers:
+      - Content-Type
+      - X-Amz-Date
+      - Authorization
+      - Accept-Enconding
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - Access-Control-Allow-Origin
+    allowCredentials: false
+<% if (dynamodb) { -%>
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+<% } -%>
+
+<% if (dynamodb) { -%>
+resources:
+  Resources:
+    mainTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-main-${opt:stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+<% } -%>
+functions:
+  service-handler:
+    handler: src/server.handler
+<% if (logForwarding) { -%>
+    logForwarding:
+      enabled: true
+<% } -%>
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: ${self:custom.cors}
+<% if (authorizer) { -%>
+          authorizer: *authorizer
+<% } -%>

@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": "dpurrington/generator-springboard",
   "files": [
-    "app"
+    "generators"
   ],
   "keywords": [
     "yeoman-generator"

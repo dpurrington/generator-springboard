@@ -1,0 +1,45 @@
+{
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-undef": 2,
+    "no-unused-vars": 1,
+    "no-console": 1,
+    "comma-dangle": ["error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "ignore"
+    }],
+    "no-trailing-spaces": 2,
+    "semi": ["error", "always"],
+    "spaced-comment": 2,
+    "arrow-parens": [2, "as-needed", { "requireForBlockBody": true }],
+    "arrow-body-style": [2, "as-needed", { "requireReturnForObjectLiteral": true }],
+    "no-var": 2,
+    "no-return-await": 2,
+    "eqeqeq": 2,
+    "guard-for-in": 2,
+    "arrow-spacing": ["error", { "before": true, "after": true }],
+    "no-lonely-if": 2,
+    "max-len": ["error", { "code": 200 }],
+    "eol-last": ["error", "always"],
+    "keyword-spacing": [2, { "before": true, "after": true }],
+    "key-spacing": [2, { "beforeColon": false, "afterColon": true }],
+    "comma-spacing": [2, { "before": false, "after": true }],
+    "brace-style": 2,
+    "no-else-return": 2,
+    "default-case": 1,
+    "dot-notation": 2,
+    "prefer-promise-reject-errors": 2
+  },
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true,
+    "browser": false
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
+  }
+}

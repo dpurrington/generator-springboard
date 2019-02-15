@@ -1,0 +1,14 @@
+.nyc_output/
+.bundle
+.idea/
+.vscode/
+vendor/
+.DS_Store
+ssl/*
+logs/*
+npm-debug.log
+node_modules/*
+!.gitkeep
+myStuff/*
+coverage/*
+.yo-rc.json

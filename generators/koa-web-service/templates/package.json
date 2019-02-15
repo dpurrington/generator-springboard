@@ -1,0 +1,70 @@
+{
+  "name": "<%= serviceName -%>",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.local.js",
+    "debug:start": "DEBUG=<%= serviceName -%>*,ss* npm start",
+    "lint": "eslint --config .eslintrc src/app.js src/conf/ src/routes/ src/test/",
+    "lint:fix": "eslint -config .eslintrc src/app.js src/conf/ src/routes/ src/test/ --fix",
+    "test": "mocha $(find ./src/test -name \"*.test.js\" | sort) --exit -R spec",
+    "test:unit": "mocha $(find ./src/test/unit -name \"*.test.js\" | sort) --exit -R spec",
+    "debug:test": "DEBUG=<%= serviceName -%>*,ss* npm test",
+    "debug:test:unit": "DEBUG=<%= serviceName -%>*,ss* npm run test:unit",
+    "cover": "nyc npm test",
+    "cover:report": "nyc --reporter=html npm test",
+    "cover:check": "nyc --check-coverage --lines 95 --functions 95 --branches 95 --reporter=html npm test",
+    "dependency_check": "madge app.js --circular",
+    "check_all": "npm run lint && npm run dependency_check && npm run cover:check"
+  },
+  "author": "SimpliSafe",
+  "license": "ISC",
+  "dependencies": {
+    "@simplisafe/ss_error": "^2.4.0",
+    "@simplisafe/ss_events": "^3.9.0",
+    "@simplisafe/ss_logger": "^3.3.0",
+    "@simplisafe/ss_mongoose": "^3.0.0",
+    "@simplisafe/ss_mysql": "^3.0.3",
+    "@simplisafe/ss_sdk": "^6.0.1",
+    "@simplisafe/ss_service_utils": "^1.2.0",
+    "aws-serverless-koa": "^1.0.0",
+    "bluebird": "^3.5.3",
+    "debug": "^3.2.6",
+    "koa": "^2.6.2",
+    "koa-joi-router": "^5.1.0",
+    "koa-joi-router-docs": "^0.1.9",
+    "koa-mount": "^3.0.0",
+    "koa-static": "^5.0.0",
+    "koa2-swagger-ui": "^2.11.9",
+    "lodash": "^4.17.10",
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.23",
+    "serverless-plugin-warmup": "^4.3.3-rc.1",
+    "serverless-offline": "4.6.0",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "@simplisafe/ss_test_utils": "^7.5.3",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-shallow-deep-equal": "^1.4.6",
+    "eslint": "^5.11.1",
+    "madge": "^3.3.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.9",
+    "nyc": "^12.0.2",
+<% if (dynamodb) { -%>
+    "serverless-dynamodb-local": "0.2.30",
+<% } -%>
+    "serverless-pseudo-parameters": "^2.4.0",
+    "supertest": "^3.1.0"
+  },
+  "nyc": {
+    "exclude": [
+      "conf/*",
+      "routes/swagger/*",
+      "test/*"
+    ]
+  }
+}
