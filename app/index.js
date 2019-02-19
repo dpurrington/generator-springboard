@@ -64,23 +64,20 @@ module.exports = class extends Generator {
         'serverless-aws-static-file-handler': '^1.0.0',
         'serverless-plugin-warmup': '^4.2.0-rc.1',
         'serverless-pseudo-parameters': '^2.4.0',
-        'swagger-ui-dist': '^3.20.3',
         uuid: '^3.3.2'
       },
       devDependencies: {
-        jest: '^23.6.0',
+        jest: '^24.1.0',
         'serverless-offline': '^3.31.3'
       }
     };
 
     if (this.answers.serviceType === 'web service') {
       pkgJson.scripts.start = 'source env/local.env && serverless offline start -s local';
-      pkgJson.scripts.docs = 'cp openapi.json node_modules/swagger-ui-dist/ && node app/utils/fixSwaggerPath.js';
-      pkgJson.scripts.build = 'npm run docs';
     }
 
     if (this.answers.dynamodb) {
-      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate';
+      pkgJson.scripts.setup = 'source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate && npm run cleanup';
       pkgJson.scripts.cleanup = 'kill -9 $(lsof -ti:8000) 2>/dev/null || true';
       pkgJson.scripts.test = 'eslint app && npm run cleanup && source env/local.env && (sls dynamodb start -s local) & sleep 5 && ./node_modules/.bin/jest && npm run cleanup';
 

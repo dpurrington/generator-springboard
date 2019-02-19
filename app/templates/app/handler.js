@@ -7,18 +7,12 @@ const {
 <% if (serviceType === 'web service') { -%>
 const {
   asyncEndpoint,
-  swaggerHandler,
 } = require('./utils');
 <% } -%>
 
 <% if (dynamodb) { -%>
 // use local dynamo when running locally
 if (process.env.STAGE === 'local') dynamoose.local('http://localhost:8000');
-
-<% } -%>
-<% if (serviceType === 'web service') { -%>
-// swagger ui for docs
-exports.swagger = swaggerHandler('/swagger-ui');
 
 <% } -%>
 <% if (serviceType === 'web service') { -%>

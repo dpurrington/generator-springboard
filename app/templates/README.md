@@ -18,7 +18,6 @@
     - [Auto add cors header](#h-10)
     - [Auto stringify body](#h-11)
   - [Documentation](#h-12)
-    - [Produce swagger docs from the serverles.yml with a single command](#h-12)
     - [Docs are served with a interactive website](#h-12)
   - [Direct invocation](#h-15)
 
@@ -33,14 +32,6 @@ npm ci
 This only needs to be run once after npm install.
 ```bash
 npm run setup
-```
-<% } -%>
-
-<% if (serviceType === 'web service') { -%>
-#### Produce swagger docs
-Please run this and commit the openapi.json if you make changes to the api documentation
-```bash
-npm build
 ```
 <% } -%>
 
@@ -81,7 +72,6 @@ This is a great tool. There is documentation and code examples in the shell that
     - [Auto add cors header](#h-10)
     - [Auto stringify body](#h-11)
   - [Documentation](#h-12)
-    - [Produce swagger docs from the serverles.yml with a single command](#h-12)
     - [Docs are served with a interactive website](#h-12)
   - [Direct invocation](#h-15)
 
@@ -187,38 +177,6 @@ if (response.body && typeof response.body === 'object') response.body = JSON.str
 // This checks if the event is a scheduled event and immediately returns to keep endpoint warm
 if (event.source && event.source === 'aws.events') return {};
 ```
-
-#### <a name="h-12"></a>Documentation
-Using a plugin called `serverless-openapi-documentation` we can easily produce Swagger v3 compatible documentation. Even better we can maintain the serverless config and the docs in a single file so they do not get out of sync. We are using the swagger-ui to provide interactive api documentation.
-```yml
-functions:
-  some-handler:
-    handler: app/handler.someHandler
-    logForwarding:
-    events:
-      - http:
-          path: somePath
-          method: get
-          documentation:
-            summary: "some summary"
-            description: "some description"
-            requestHeaders:
-              -
-                name: "Authorization"
-                description: "Bearer token"
-            methodResponses:
-                -
-                  statusCode: "200"
-                  responseBody:
-                    description: "List of users"
-                  responseModels:
-                    "application/json": "User"
-                -
-                  statusCode: "409"
-                  responseModels:
-                    "application/json": "ErrorResponse"
-```
-
 #### <a name="h-15"></a>Direct invocation
 Since we are providing simple Lambda handlers we can also directly invoke each endpoint so lambdas can talk to each other without passing through api gateway.
 ```javascript
