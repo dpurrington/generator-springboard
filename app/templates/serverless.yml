@@ -124,29 +124,6 @@ functions:
       - schedule: rate(5 minutes)
 <% } -%>
 <% if (serviceType === 'web service') { -%>
-  swagger:
-    handler: app/handler.swagger
-    events:
-      - http:
-          path: swagger-ui
-          method: get
-      - http:
-          path: /openapi.json
-          method: get
-          contentHandling: CONVERT_TO_BINARY
-      - http:
-          path: swagger-ui-bundle.js
-          method: get
-          contentHandling: CONVERT_TO_BINARY
-      - http:
-          path: swagger-ui-standalone-preset.js
-          method: get
-          contentHandling: CONVERT_TO_BINARY
-      - http:
-          path: swagger-ui.css
-          method: get
-          contentHandling: CONVERT_TO_BINARY
-
   get-thing:
     handler: app/handler.getThing
 <% if (logForwarding) { -%>
