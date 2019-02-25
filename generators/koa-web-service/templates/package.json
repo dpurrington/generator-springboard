@@ -8,6 +8,13 @@
     "debug:start": "DEBUG=<%= serviceName -%>*,ss* npm start",
     "lint": "eslint --config .eslintrc src/app.js src/conf/ src/routes/ src/test/",
     "lint:fix": "eslint -config .eslintrc src/app.js src/conf/ src/routes/ src/test/ --fix",
+<% if (dynamodb) { -%>
+  "setup": "source env/local.env && serverless dynamodb install -s local && serverless dynamodb start --migrate && npm run cleanup",
+  "cleanup": "kill -9 $(lsof -ti:8000) 2>/dev/null || true",
+  "test": "eslint app && npm run cleanup && source env/local.env && (sls dynamodb start -s local) & sleep 5 && ./node_modules/.bin/jest && npm run cleanup",
+<% } else { -%>
+   "test": "eslint app && jest",
+<% } -%>
     "test": "mocha $(find ./src/test -name \"*.test.js\" | sort) --exit -R spec",
     "test:unit": "mocha $(find ./src/test/unit -name \"*.test.js\" | sort) --exit -R spec",
     "debug:test": "DEBUG=<%= serviceName -%>*,ss* npm test",
@@ -42,6 +49,12 @@
     "moment-timezone": "^0.5.23",
     "serverless-plugin-warmup": "^4.3.3-rc.1",
     "serverless-offline": "4.6.0",
+<% if (dynamodb) { -%>
+    "dynamoose": "^1.3.0",
+<% } -%>
+<% if (logForwarding) { -%>
+    "serverless-log-forwarding": "^1.3.0",
+<% } -%>
     "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
