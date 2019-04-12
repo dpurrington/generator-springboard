@@ -1,70 +1,48 @@
-service: <%= serviceName -%>
-
+# For more info on the format of this file and all options available,
+# See https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: <%= serviceName %>
 provider:
   name: aws
   runtime: nodejs8.10
   memorySize: 512
-<% if (vpc) { -%>
-  vpc:
-    securityGroupIds:
-      - ${env:SECURITY_GROUP_ID}
-    subnetIds:
-      - ${env:SUBNET_ID}
-      - ${env:SUBNET2_ID}
-<% } -%>
+  # VPC, if desired
+  #  vpc:
+  #  securityGroupIds:
+  #    - Fn::Split
+  #    - ${env:SECURITY_GROUPS}
+  #  subnetIds:
+  #    - Fn::Split
+  #    - ${env:SUBNETS}
   environment:
     STAGE: ${opt:stage}
-<% if (dynamodb) { -%>
-    MAIN_TABLE: ${self:service}-main-${opt:stage}
-<% } -%>
-<% if (serviceType === 'web service') { -%>
-    API_ROOT:
-      Fn::Join:
-        - ""
-        - - "https://"
-          - Ref: "ApiGatewayRestApi"
-          - ".execute-api.#{AWS::Region}.amazonaws.com/${opt:stage}"
-<% } -%>
+    # Configure the name of the table for lambdas, if relevant
+    # MAIN_TABLE: ${self:service}-main-${opt:stage}
 
-<% if (dynamodb) { -%>
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - "dynamodb:*"
-      Resource:
-        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}
-        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}/*
+  # Enable access to any extra resources in the stack (e.g., DynamoDB table)
+  #iamRoleStatements:
+  #  - Effect: Allow
+  #    Action:
+  #      - "dynamodb:*"
+  #    Resource:
+  #      - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}
+  #      - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-main-${opt:stage}/*
 
-<% } -%>
 plugins:
+  # This plugin lets you use the #{AWS::} parameters
   - serverless-pseudo-parameters
+  # This plugin ensures there is at least one warm Lambda instance
   - serverless-plugin-warmup
-<% if (serviceType === 'web service') { -%>
   - serverless-offline
-<% } -%>
-<% if (dynamodb) { -%>
-  - serverless-dynamodb-local
-<% } -%>
-
-package:
-  exclude:
-    - test/**
+  # TODO: is a log forwarding plugin needed here?
 
 custom:
   warmup:
     default: true
-<% if (authorizer) { -%>
-  <<: &authorizer
-    arn: ${env:AUTHORIZER_ARN}
-    identityValidationExpression: ^Bearer +[-0-9a-zA-Z\._]*$
-    resultTtlInSeconds: 300
-<% } -%>
-<% if (logForwarding) { -%>
-  logForwarding:
-    destinationARN: ${env:LOGFORWARDING_CLOUDWATCH_ARN}
-    filterPattern: '-START -END -REPORT'
-<% } -%>
-<% if (serviceType === 'web service') { -%>
+  # If using an API gateway custom authorizer (account-wide), describe it here
+  #<<: &authorizer
+  #  arn: ${env:AUTHORIZER_ARN}
+  #  identityValidationExpression: ^Bearer +[-0-9a-zA-Z\._]*$
+  #  resultTtlInSeconds: 300
   serverless-offline:
     port: 3001
   cors:
@@ -79,63 +57,40 @@ custom:
       - X-Amz-User-Agent
       - Access-Control-Allow-Origin
     allowCredentials: false
-<% } -%>
-<% if (dynamodb) { -%>
-  dynamodb:
-    stages:
-      - local
-    start:
-      port: 8000
-      inMemory: true
-      heapInitial: 200m
-      heapMax: 1g
-      migrate: true
-      seed: true
-      convertEmptyValues: true
-<% } -%>
-
-<% if (dynamodb) { -%>
-resources:
-  Resources:
-    mainTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:service}-main-${opt:stage}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-
-<% } -%>
+  # settings for forwarding logs (streaming) to a forwarding lambda (account-wide)
+  #logForwarding:
+  #  destinationARN: ${env:LOGFORWARDING_CLOUDWATCH_ARN}
+  #  filterPattern: '-START -END -REPORT'
 functions:
-<% if (serviceType === 'scheduled task') { -%>
-  do-thing:
-    handler: app/handler.doThing
-<% if (logForwarding) { -%>
-    logForwarding:
-      enabled: true
-<% } -%>
-    events:
-      - schedule: rate(5 minutes)
-<% } -%>
-<% if (serviceType === 'web service') { -%>
-  get-thing:
-    handler: app/handler.getThing
-<% if (logForwarding) { -%>
-    logForwarding:
-      enabled: true
-<% } -%>
+  service-handler:
+    handler: src/server.handler
+    # If using log forwarding, enable it here
+    #logForwarding:
+    #  enabled: true
     events:
       - http:
-          path: things/{id}
-          method: get
+          path: /{proxy+}
+          method: any
           cors: ${self:custom.cors}
-<% if (authorizer) { -%>
-          authorizer: *authorizer
-<% } -%>
-<% } -%>
+          # Specify custom authorizer if being used
+          # authorizer: *authorizer
+
+# Define additional resources here. If you add something here, don't forget
+# to add permission for your Lambdas to access it by adding permissions in the
+# iamRoleStatements section.
+# Here's an example of a basic DynamoDB table
+#resources:
+#  Resources:
+#    mainTable:
+#      Type: AWS::DynamoDB::Table
+#      Properties:
+#        TableName: ${self:service}-main-${opt:stage}
+#        AttributeDefinitions:
+#          - AttributeName: id
+#            AttributeType: S
+#        KeySchema:
+#          - AttributeName: id
+#            KeyType: HASH
+#        ProvisionedThroughput:
+#          ReadCapacityUnits: 5
+#          WriteCapacityUnits: 5

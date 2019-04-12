@@ -11,34 +11,9 @@ module.exports = class extends Generator {
       type: 'list',
       name: 'serviceType',
       message: 'Service type',
-      choices: ['web service', 'scheduled task'],
-      default: 'web service'
-    }, {
-      type: 'confirm',
-      name: 'dynamodb',
-      message: 'Would you like to use DynamoDB?'
-    }, {
-      type: 'confirm',
-      name: 'logForwarding',
-      message: 'Would you like to use log forwarding?',
-      default: false
-    }, {
-      type: 'confirm',
-      name: 'vpc',
-      message: 'Would you like to put the Lambda functions in a VPC?',
-      default: false
+      choices: ['koa web service', 'scheduled task'],
+      default: 'koa web service'
     }]);
-    answers.authorizer = false;
-
-    if (answers.serviceType === 'web service') {
-      const auth = await this.prompt([{
-        type: 'confirm',
-        name: 'authorizer',
-        message: 'Would you like to use a custom authorizer for the API Gateway routes?',
-        default: false
-      }]);
-      answers.authorizer = auth.authorizer;
-    }
 
     this.answers = answers;
   }
@@ -48,27 +23,56 @@ module.exports = class extends Generator {
       name: this.answers.serviceName,
       version: '1.0.0',
       description: '',
-      main: 'index.js',
-      author: '',
+      main: 'src/server.js',
+      author: 'SimpliSafe',
       license: 'ISC',
       scripts: {
-        lint: 'eslint app',
-        test: 'eslint app && jest',
+        start: "node src/server.local.js",
+        "debug:start": "DEBUG=<%= serviceName -%>*,ss* npm start",
+        lint: "eslint .",
+        "lint:fix": "eslint . --fix",
+        test: "jest",
+        "test:watch": "jest --watchAll",
+        "debug:test": "DEBUG=<%= serviceName -%>*,ss* npm test",
+        cover: "jest --collect-coverage",
+        dependency_check: "madge src/app.js --circular",
+        ci: "npm run lint && npm run dependency_check && npm run cover"
       },
       dependencies: {
-        eslint: '^5.1.0',
-        'eslint-config-airbnb-base': '^13.0.0',
-        'eslint-plugin-import': '^2.13.0',
-        pino: '^5.10.3',
-        'pino-pretty': '^2.5.0',
-        'serverless-aws-static-file-handler': '^1.0.0',
-        'serverless-plugin-warmup': '^4.2.0-rc.1',
-        'serverless-pseudo-parameters': '^2.4.0',
-        uuid: '^3.3.2'
+        "@simplisafe/ss_error": "^2.4.0",
+        "@simplisafe/ss_service_utils": "^1.2.0",
+        "serverless-http": "^1.9.1",  //TODO: get the right version here
+        "debug": "^3.2.6",
+        "koa": "^2.6.2",
+        "koa-joi-router": "^5.1.0",
+        "koa-joi-router-docs": "^0.1.9",
+        "koa-mount": "^3.0.0",
+        "koa-pino-logger": "^2.1.3",
+        "koa-static": "^5.0.0",
+        "koa2-swagger-ui": "^2.11.9",
+        "lodash": "^4.17.10",
+        "pino": "^5.12.0",
+        "serverless-offline": "4.6.0",
+        "serverless-plugin-warmup": "^4.3.3-rc.1"
       },
       devDependencies: {
-        jest: '^24.1.0',
-        'serverless-offline': '^3.31.3'
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "chai-shallow-deep-equal": "^1.4.6",
+        "eslint": "^5.11.1",
+        "eslint-plugin-jest": "^22.4.1",
+        "jest": "^24.7.0",
+        "madge": "^3.3.0",
+        "nodemon": "^1.18.9",
+        "serverless-pseudo-parameters": "^2.4.0",
+        "supertest": "^3.1.0"
+      },
+      nyc: {
+        exclude: [
+          "conf/*",
+          "routes/swagger/*",
+          "test/*"
+        ],
       }
     };
 

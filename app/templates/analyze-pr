@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+sed -i.old 's/^.*delta7/\./g' coverage/lcov.info
+rm coverage/*.old
+bash <(curl -s https://codecov.io/bash -f coverage/lcov.info -t $CODECOV_TOKEN)
