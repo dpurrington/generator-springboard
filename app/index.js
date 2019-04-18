@@ -27,7 +27,7 @@ module.exports = class extends Generator {
       author: 'SimpliSafe',
       license: 'ISC',
       scripts: {
-        start: "node src/server.local.js",
+        start: "sls offline -s local",
         "debug:start": "DEBUG=<%= serviceName -%>*,ss* npm start",
         lint: "eslint .",
         "lint:fix": "eslint . --fix",
