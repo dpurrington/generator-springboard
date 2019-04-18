@@ -41,7 +41,7 @@ module.exports = class extends Generator {
       dependencies: {
         "@simplisafe/ss_error": "^2.4.0",
         "@simplisafe/ss_service_utils": "^1.2.0",
-        "serverless-http": "^1.9.1",  //TODO: get the right version here
+        "serverless-http": "^1.9.1",
         "debug": "^3.2.6",
         "koa": "^2.6.2",
         "koa-joi-router": "^5.1.0",
@@ -51,8 +51,7 @@ module.exports = class extends Generator {
         "koa-static": "^5.0.0",
         "koa2-swagger-ui": "^2.11.9",
         "lodash.tostring": "^4.1.4",
-        "pino": "^5.12.0",
-        "serverless-plugin-warmup": "^4.3.3-rc.1"
+        "pino": "^5.12.0"
       },
       devDependencies: {
         "chai": "^4.1.2",
@@ -65,6 +64,7 @@ module.exports = class extends Generator {
         "nodemon": "^1.18.9",
         "serverless-offline": "4.6.0",
         "serverless-pseudo-parameters": "^2.4.0",
+        "serverless-plugin-warmup": "^4.3.3-rc.1",
         "supertest": "^3.1.0"
       },
       nyc: {
