@@ -50,9 +50,8 @@ module.exports = class extends Generator {
         "koa-pino-logger": "^2.1.3",
         "koa-static": "^5.0.0",
         "koa2-swagger-ui": "^2.11.9",
-        "lodash": "^4.17.10",
+        "lodash.tostring": "^4.1.4",
         "pino": "^5.12.0",
-        "serverless-offline": "4.6.0",
         "serverless-plugin-warmup": "^4.3.3-rc.1"
       },
       devDependencies: {
@@ -64,6 +63,7 @@ module.exports = class extends Generator {
         "jest": "^24.7.0",
         "madge": "^3.3.0",
         "nodemon": "^1.18.9",
+        "serverless-offline": "4.6.0",
         "serverless-pseudo-parameters": "^2.4.0",
         "supertest": "^3.1.0"
       },

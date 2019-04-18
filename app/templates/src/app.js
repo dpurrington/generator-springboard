@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const debug = require('debug')('<%= serviceName -%>:app');
 const { handleErrorsKoa } = require('@simplisafe/ss_error');
 const middleware = require('@simplisafe/ss_service_utils').middleware;
@@ -7,6 +6,7 @@ const KoaSwagger = require('koa2-swagger-ui');
 const mount = require('koa-mount');
 const pino = require('koa-pino-logger')({ level: 'error' });
 const routes = require('./routes');
+const toString = require('lodash.tostring')
 
 const app = new Koa();    // App Routes
 const server = new Koa(); // Overall Application
@@ -31,7 +31,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (e) {
-    ctx.log.error(_.toString(e));
+    ctx.log.error(toString(e));
     return handleErrorsKoa(e, ctx);
   }
 });
