@@ -6,20 +6,26 @@ provider:
   runtime: nodejs8.10
   memorySize: 512
   # VPC, if desired
-  #  vpc:
+  #vpc:
   #  securityGroupIds:
-  #    - Fn::Split
-  #    - ${env:SECURITY_GROUPS}
+  #    Fn::Split
+  #      - ','
+  #      - ${env:SECURITY_GROUPS}
   #  subnetIds:
-  #    - Fn::Split
-  #    - ${env:SUBNETS}
+  #    Fn::Split
+  #      - ','
+  #      - ${env:SUBNETS}
   environment:
     STAGE: ${opt:stage}
     # Configure the name of the table for lambdas, if relevant
     # MAIN_TABLE: ${self:service}-main-${opt:stage}
 
   # Enable access to any extra resources in the stack (e.g., DynamoDB table)
-  #iamRoleStatements:
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+          - "lambda:*"
+      Resource: "*"
   #  - Effect: Allow
   #    Action:
   #      - "dynamodb:*"
@@ -37,7 +43,7 @@ plugins:
 
 custom:
   warmup:
-    default: true
+    enabled: true
   # If using an API gateway custom authorizer (account-wide), describe it here
   #<<: &authorizer
   #  arn: ${env:AUTHORIZER_ARN}
