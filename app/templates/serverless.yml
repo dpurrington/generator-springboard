@@ -8,13 +8,13 @@ provider:
   # VPC, if desired
   #vpc:
   #  securityGroupIds:
-  #    Fn::Split
-  #      - ','
-  #      - ${env:SECURITY_GROUPS}
+  #    'Fn::Split':
+  #     - ','
+  #     - ${env:SECURITY_GROUPS}
   #  subnetIds:
-  #    Fn::Split
-  #      - ','
-  #      - ${env:SUBNETS}
+  #    'Fn::Split':
+  #     - ','
+  #     - ${env:SUBNETS}
   environment:
     STAGE: ${opt:stage}
     # Configure the name of the table for lambdas, if relevant
